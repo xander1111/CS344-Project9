@@ -69,11 +69,22 @@ int allocate_page()
 void new_process(int proc_num, int page_count)
 {
     int page_table_page = allocate_page();
+
+    if (page_table_page == 0xff) {
+        printf("OOM: proc %d: page table\n", proc_num);
+        return;
+    }
+
     mem[PTP_OFFSET + proc_num] = page_table_page;
 
     for (int i = 0; i < page_count; i++)
     {
-        mem[get_address(page_table_page, i)] = allocate_page();
+        int new_page = allocate_page();
+        if (new_page == 0xff) {
+            printf("OOM: proc %d: data page\n", proc_num);
+            return;
+        }
+        mem[get_address(page_table_page, i)] = new_page;
     }
 }
 
