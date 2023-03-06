@@ -43,7 +43,7 @@ unsigned char get_page_table(int proc_num)
 
 
 //
-// Returns the first free page
+// Returns the index of the first free page
 //
 int find_free_page()
 {
@@ -67,7 +67,15 @@ void new_process(int proc_num, int page_count)
     int page_table_page = find_free_page();
     mem[PTP_OFFSET + proc_num] = page_table_page;
     mem[page_table_page] = 1;
-    printf("page: %d, proc: %d, page_count: %d\n", page_table_page, proc_num, page_count);
+
+    int page_table_address = get_address(page_table_page, 0);
+
+    for (int i = 0; i < page_count; i++)
+    {
+        int new_page = find_free_page();
+        mem[page_table_address + i] = new_page;
+        mem[new_page] = 1;
+    }
 }
 
 //
