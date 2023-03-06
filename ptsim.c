@@ -45,7 +45,7 @@ unsigned char get_page_table(int proc_num)
 //
 // Returns the index of the first free page
 //
-int find_free_page()
+int allocate_page()
 {
     int free_page = -1;
     int map_entry = 0;
@@ -54,7 +54,11 @@ int find_free_page()
         if (mem[++map_entry] == 0) free_page = map_entry;
     } while (map_entry < PAGE_COUNT && free_page < 0);
 
-    return free_page;
+    if (free_page == -1) return 0xff;
+    else {
+        mem[free_page] = 1;
+        return free_page;
+    }
 }
 
 //
@@ -64,17 +68,14 @@ int find_free_page()
 //
 void new_process(int proc_num, int page_count)
 {
-    int page_table_page = find_free_page();
+    int page_table_page = allocate_page();
     mem[PTP_OFFSET + proc_num] = page_table_page;
-    mem[page_table_page] = 1;
 
     int page_table_address = get_address(page_table_page, 0);
 
     for (int i = 0; i < page_count; i++)
     {
-        int new_page = find_free_page();
-        mem[page_table_address + i] = new_page;
-        mem[new_page] = 1;
+        mem[page_table_address + i] = allocate_page();
     }
 }
 
