@@ -51,7 +51,7 @@ int find_free_page()
     int map_entry = 0;
     do
     {
-        if (mem[map_entry++] == 0) free_page = map_entry;
+        if (mem[++map_entry] == 0) free_page = map_entry;
     } while (map_entry < PAGE_COUNT && free_page < 0);
 
     return free_page;
@@ -64,8 +64,10 @@ int find_free_page()
 //
 void new_process(int proc_num, int page_count)
 {
-    int page = find_free_page();
-    printf("page: %d, proc: %d, page_count: %d\n", page, proc_num, page_count);
+    int page_table_page = find_free_page();
+    mem[PTP_OFFSET + proc_num] = page_table_page;
+    mem[page_table_page] = 1;
+    printf("page: %d, proc: %d, page_count: %d\n", page_table_page, proc_num, page_count);
 }
 
 //
