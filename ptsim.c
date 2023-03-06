@@ -41,6 +41,22 @@ unsigned char get_page_table(int proc_num)
     return mem[ptp_addr];
 }
 
+
+//
+// Returns the first free page
+//
+int find_free_page()
+{
+    int free_page = -1;
+    int map_entry = 0;
+    do
+    {
+        if (mem[map_entry++] == 0) free_page = map_entry;
+    } while (map_entry < PAGE_COUNT && free_page < 0);
+
+    return free_page;
+}
+
 //
 // Allocate pages for a new process
 //
@@ -48,10 +64,8 @@ unsigned char get_page_table(int proc_num)
 //
 void new_process(int proc_num, int page_count)
 {
-    (void)proc_num;   // remove after implementation
-    (void)page_count; // remove after implementation
-
-    // TODO
+    int page = find_free_page();
+    printf("page: %d, proc: %d, page_count: %d\n", page, proc_num, page_count);
 }
 
 //
@@ -118,6 +132,10 @@ int main(int argc, char *argv[])
         else if (strcmp(argv[i], "ppt") == 0) {
             int proc_num = atoi(argv[++i]);
             print_page_table(proc_num);
+        } else if (strcmp(argv[i], "np") == 0) {
+            int proc_num = atoi(argv[++i]);
+            int page_count = atoi(argv[++i]);
+            new_process(proc_num, page_count);
         }
 
         // TODO: more command line arguments
