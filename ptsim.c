@@ -71,11 +71,9 @@ void new_process(int proc_num, int page_count)
     int page_table_page = allocate_page();
     mem[PTP_OFFSET + proc_num] = page_table_page;
 
-    int page_table_address = get_address(page_table_page, 0);
-
     for (int i = 0; i < page_count; i++)
     {
-        mem[page_table_address + i] = allocate_page();
+        mem[get_address(page_table_page, i)] = allocate_page();
     }
 }
 
