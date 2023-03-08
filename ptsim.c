@@ -115,6 +115,30 @@ void kill_process(int proc_num)
 }
 
 //
+// Returns the corresponding physical address from a given process number and virtual address
+//
+int get_physical_addr(int proc_num, int virt_address)
+{
+    int page_table_page = mem[proc_num + PTP_OFFSET];
+    int virt_page = virt_address >> PAGE_SHIFT;
+    int physical_page = mem[get_address(page_table_page, virt_page)];
+
+    int offset = virt_address & 255;
+
+    return get_address(physical_page, offset);
+}
+
+//
+// Stores a value at a given processes virtual address
+//
+void store_value(int proc_num, int virt_address, int value)
+{
+    int physical_addr = get_physical_addr(proc_num, virt_address);
+
+    mem[physical_addr] = value;
+}
+
+//
 // Print the free page map
 //
 // Don't modify this
@@ -189,12 +213,14 @@ int main(int argc, char *argv[])
             kill_process(proc_num);
         }
         else if (strcmp(argv[i], "sb") == 0) {
+            int proc_num = atoi(argv[++i]);
+            int virt_address = atoi(argv[++i]);
+            int value = atoi(argv[++i]);
 
+            store_value(proc_num, virt_address, value);
         }
         else if (strcmp(argv[i], "lb") == 0) {
 
         }
-
-        // TODO: more command line arguments
     }
 }
