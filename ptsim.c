@@ -117,13 +117,13 @@ void kill_process(int proc_num)
 //
 // Returns the corresponding physical address from a given process number and virtual address
 //
-int get_physical_addr(int proc_num, int virt_address)
+int get_physical_addr(int proc_num, int v_addr)
 {
     int page_table_page = mem[proc_num + PTP_OFFSET];
-    int virt_page = virt_address >> PAGE_SHIFT;
+    int virt_page = v_addr >> PAGE_SHIFT;
     int physical_page = mem[get_address(page_table_page, virt_page)];
 
-    int offset = virt_address & 255;
+    int offset = v_addr & 255;
 
     return get_address(physical_page, offset);
 }
@@ -131,11 +131,27 @@ int get_physical_addr(int proc_num, int virt_address)
 //
 // Stores a value at a given processes virtual address
 //
-void store_value(int proc_num, int virt_address, int value)
+void store_value(int proc_num, int v_addr, int value)
 {
-    int physical_addr = get_physical_addr(proc_num, virt_address);
+    int p_addr = get_physical_addr(proc_num, v_addr);
 
-    mem[physical_addr] = value;
+    mem[p_addr] = value;
+
+    printf("Store proc %d: %d => %d, value=%d\n",
+    proc_num, v_addr, p_addr, value);
+}
+
+//
+// Prints the value stored to a given processes virtual address
+//
+void load_value(int proc_num, int virt_addr)
+{
+    int physical_addr = get_physical_addr(proc_num, virt_addr);
+    int value = mem[physical_addr];
+
+
+    printf("Load proc %d: %d => %d, value=%d\n",
+    proc_num, virt_addr, physical_addr, value);
 }
 
 //
@@ -214,13 +230,16 @@ int main(int argc, char *argv[])
         }
         else if (strcmp(argv[i], "sb") == 0) {
             int proc_num = atoi(argv[++i]);
-            int virt_address = atoi(argv[++i]);
+            int v_addr = atoi(argv[++i]);
             int value = atoi(argv[++i]);
 
-            store_value(proc_num, virt_address, value);
+            store_value(proc_num, v_addr, value);
         }
         else if (strcmp(argv[i], "lb") == 0) {
+            int proc_num = atoi(argv[++i]);
+            int v_addr = atoi(argv[++i]);
 
+            load_value(proc_num, v_addr);
         }
     }
 }
