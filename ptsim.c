@@ -41,7 +41,6 @@ unsigned char get_page_table(int proc_num)
     return mem[ptp_addr];
 }
 
-
 //
 // Returns the index of the first free page
 //
@@ -59,6 +58,14 @@ int allocate_page()
         mem[free_page] = 1;
         return free_page;
     }
+}
+
+//
+// Deallocates the page at the given index
+//
+void deallocate_page(int page_number)
+{
+    mem[page_number] = 0;
 }
 
 //
@@ -86,6 +93,25 @@ void new_process(int proc_num, int page_count)
         }
         mem[get_address(page_table_page, i)] = new_page;
     }
+}
+
+//
+// Kills the given process, deallocating every page it used
+//
+void kill_process(int proc_num)
+{
+    int page_table_page = mem[proc_num + PTP_OFFSET];
+    mem[proc_num + PTP_OFFSET] = 0;
+
+    for (int i = 0; i < 256; i++)
+    {
+        int page_i = get_address(page_table_page, i);
+        if (mem[page_i] != 0) {
+            deallocate_page(mem[page_i]);
+        }
+    }
+
+    deallocate_page(page_table_page);
 }
 
 //
@@ -152,10 +178,21 @@ int main(int argc, char *argv[])
         else if (strcmp(argv[i], "ppt") == 0) {
             int proc_num = atoi(argv[++i]);
             print_page_table(proc_num);
-        } else if (strcmp(argv[i], "np") == 0) {
+        }
+        else if (strcmp(argv[i], "np") == 0) {
             int proc_num = atoi(argv[++i]);
             int page_count = atoi(argv[++i]);
             new_process(proc_num, page_count);
+        }
+        else if (strcmp(argv[i], "kp") == 0) {
+            int proc_num = atoi(argv[++i]);
+            kill_process(proc_num);
+        }
+        else if (strcmp(argv[i], "sb") == 0) {
+
+        }
+        else if (strcmp(argv[i], "lb") == 0) {
+
         }
 
         // TODO: more command line arguments
