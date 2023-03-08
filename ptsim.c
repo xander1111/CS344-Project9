@@ -144,14 +144,13 @@ void store_value(int proc_num, int v_addr, int value)
 //
 // Prints the value stored to a given processes virtual address
 //
-void load_value(int proc_num, int virt_addr)
+void load_value(int proc_num, int v_addr)
 {
-    int physical_addr = get_physical_addr(proc_num, virt_addr);
+    int physical_addr = get_physical_addr(proc_num, v_addr);
     int value = mem[physical_addr];
 
-
     printf("Load proc %d: %d => %d, value=%d\n",
-    proc_num, virt_addr, physical_addr, value);
+    proc_num, v_addr, physical_addr, value);
 }
 
 //
